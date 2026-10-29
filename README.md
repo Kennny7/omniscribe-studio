@@ -96,3 +96,15 @@ graph TD
     Swarm & Editor --> MainLLM & Uncensored
 ```
 </details>
+
+
+# Quick Start
+
+# 1. Start Docker persistence services
+docker compose up -d
+
+# 2. Sync all microservices using Astral uv
+uv sync --all-packages
+
+# 3. Launch the Core Gateway (Port 8000)
+uv run --package core-gateway uvicorn core_gateway.main:app --reload --port 8000
