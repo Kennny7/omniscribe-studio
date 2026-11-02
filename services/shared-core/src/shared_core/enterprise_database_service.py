@@ -48,25 +48,24 @@ class AgentTraitModel(Base):
 class TraitEvolutionLogModel(Base):
     __tablename__ = "trait_evolution_log"
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    agent_id = Column(String(64), index=True, nullable=False)
-    trigger_channel = Column(String(32), nullable=False)  # explicit | implicit | inter_agent
+    log_id = Column(Integer, primary_key=True, autoincrement=True)
+    agent_id = Column(String(64), nullable=False, index=True)
     previous_traits = Column(JSON, nullable=False)
-    new_traits = Column(JSON, nullable=False)
-    delta_applied = Column(JSON, nullable=False)
+    updated_traits = Column(JSON, nullable=False)
+    deltas = Column(JSON, nullable=False)
+    trigger_channel = Column(String(32), nullable=False)  # explicit | implicit_edit_distance
     reason = Column(Text, nullable=True)
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    timestamp = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
 
-class ParagraphVersionModel(Base):
-    """Git-like granular version control per paragraph for instant Undo/Redo."""
-    __tablename__ = "paragraph_versions"
+class ChapterParagraphVersionModel(Base):
+    __tablename__ = "chapter_paragraph_versions"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    project_id = Column(String(64), index=True, nullable=False)
-    chapter_id = Column(String(64), index=True, nullable=False)
-    paragraph_index = Column(Integer, index=True, nullable=False)
-    version_number = Column(Integer, nullable=False)
+    project_id = Column(String(64), nullable=False, index=True)
+    chapter_id = Column(String(64), nullable=False, index=True)
+    paragraph_index = Column(Integer, nullable=False)
+    version = Column(Integer, nullable=False)
     raw_content = Column(Text, nullable=False)
     styled_content = Column(Text, nullable=False)
     author_agent_id = Column(String(64), nullable=False)
@@ -81,6 +80,7 @@ class EnterpriseDatabaseService:
     """
     Manages PostgreSQL (with automatic SQLite fallback), Neo4j Knowledge Graph,
     Qdrant Genre-Tagged Vector Store, and Redis Live Telemetry Streams.
+    Allows dynamic switching between Docker enterprise services and local lite engines.
     """
 
     def __init__(self) -> None:
@@ -88,6 +88,7 @@ class EnterpriseDatabaseService:
         self.sqlite_engine: AsyncEngine | None = None
         self.active_session_factory: async_sessionmaker[AsyncSession] | None = None
         self.using_sqlite_fallback: bool = False
+        self.force_local_mode: bool = False
 
         self.neo4j_driver: AsyncDriver | None = None
         self.qdrant_client: AsyncQdrantClient | None = None
@@ -100,11 +101,68 @@ class EnterpriseDatabaseService:
         await self._init_neo4j()
         await self._init_qdrant()
 
+    async def set_storage_mode(self, mode: str) -> dict[str, Any]:
+        """
+        Manually switch storage target: 'docker' (Postgres/Neo4j/Qdrant/Redis)
+        or 'local' (SQLite lite mode with memory fallbacks).
+        """
+        if mode == "local":
+            self.force_local_mode = True
+            if not self.sqlite_engine:
+                self.sqlite_engine = create_async_engine(settings.sqlite_dsn, echo=False)
+                async with self.sqlite_engine.begin() as conn:
+                    await conn.run_sync(Base.metadata.create_all)
+            self.active_session_factory = async_sessionmaker(self.sqlite_engine, expire_on_commit=False)
+            self.using_sqlite_fallback = True
+            logger.info("storage_mode.switched", mode="local_sqlite")
+        else:
+            self.force_local_mode = False
+            await self.initialize()
+            logger.info("storage_mode.switched", mode="docker_services")
+
+        return await self.get_service_status()
+
+    async def get_service_status(self) -> dict[str, Any]:
+        """Returns comprehensive diagnostic and health status of all storage engines."""
+        return {
+            "storage_target": "local" if self.using_sqlite_fallback else "docker",
+            "sqlite_fallback_active": self.using_sqlite_fallback,
+            "force_local_mode": self.force_local_mode,
+            "services": {
+                "postgres": {
+                    "connected": not self.using_sqlite_fallback and self.pg_engine is not None,
+                    "target": "PostgreSQL 16 (omniscribe-postgres:5432)" if not self.using_sqlite_fallback else "Local SQLite (data/trait_engine/traits.db)",
+                    "status": "online" if (not self.using_sqlite_fallback and self.pg_engine is not None) else "local_fallback",
+                },
+                "neo4j": {
+                    "connected": self.neo4j_driver is not None,
+                    "target": "Neo4j 5 Graph (omniscribe-neo4j:7687)" if self.neo4j_driver else "In-Memory Lore Graph Mock",
+                    "status": "online" if self.neo4j_driver is not None else "offline",
+                },
+                "qdrant": {
+                    "connected": self.qdrant_client is not None,
+                    "target": "Qdrant Vector DB (omniscribe-qdrant:6333)" if self.qdrant_client else "Local In-Memory Vector Store",
+                    "status": "online" if self.qdrant_client is not None else "offline",
+                },
+                "redis": {
+                    "connected": self.redis_client is not None,
+                    "target": "Redis 7.4 Streams (omniscribe-redis:6379)" if self.redis_client else "Direct Local Async Event Loop",
+                    "status": "online" if self.redis_client is not None else "offline",
+                },
+            },
+        }
+
     async def _init_relational_db(self) -> None:
         # Always prepare SQLite fallback in data/trait_engine/traits.db
         self.sqlite_engine = create_async_engine(settings.sqlite_dsn, echo=False)
         async with self.sqlite_engine.begin() as conn:
             await conn.run_sync(Base.metadata.create_all)
+
+        if self.force_local_mode:
+            self.active_session_factory = async_sessionmaker(self.sqlite_engine, expire_on_commit=False)
+            self.using_sqlite_fallback = True
+            logger.info("relational_db.using_forced_local_sqlite")
+            return
 
         try:
             self.pg_engine = create_async_engine(
@@ -130,6 +188,9 @@ class EnterpriseDatabaseService:
             self.using_sqlite_fallback = True
 
     async def _init_redis(self) -> None:
+        if self.force_local_mode:
+            self.redis_client = None
+            return
         try:
             self.redis_client = aioredis.from_url(settings.REDIS_URL, decode_responses=True)
             await self.redis_client.ping()
@@ -139,6 +200,9 @@ class EnterpriseDatabaseService:
             self.redis_client = None
 
     async def _init_neo4j(self) -> None:
+        if self.force_local_mode:
+            self.neo4j_driver = None
+            return
         try:
             self.neo4j_driver = AsyncGraphDatabase.driver(
                 settings.NEO4J_URI, auth=(settings.NEO4J_USER, settings.NEO4J_PASSWORD)
@@ -151,6 +215,9 @@ class EnterpriseDatabaseService:
             self.neo4j_driver = None
 
     async def _init_qdrant(self) -> None:
+        if self.force_local_mode:
+            self.qdrant_client = None
+            return
         try:
             self.qdrant_client = AsyncQdrantClient(
                 host=settings.QDRANT_HOST, port=settings.QDRANT_PORT
