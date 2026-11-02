@@ -1,0 +1,164 @@
+/* omniscribe-studio/frontend-angular/src/app/app.component.css */
+.studio-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  font-family: 'Inter', system-ui, sans-serif;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+/* 1. Dark Obsidian Mode */
+.studio-shell.theme-dark {
+  --bg-primary: #0b0f19;
+  --bg-secondary: #111827;
+  --bg-card: #1e293b;
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --accent: #f59e0b;
+  --border: #334155;
+}
+
+/* 2. Light Parchment Mode */
+.studio-shell.theme-light {
+  --bg-primary: #fbf8f1;
+  --bg-secondary: #f3ede0;
+  --bg-card: #ffffff;
+  --text-main: #1e293b;
+  --text-muted: #64748b;
+  --accent: #b45309;
+  --border: #d6cebf;
+}
+
+/* 3. Neutral Grey Studio Mode */
+.studio-shell.theme-grey {
+  --bg-primary: #27272a;
+  --bg-secondary: #3f3f46;
+  --bg-card: #52525b;
+  --text-main: #f4f4f5;
+  --text-muted: #d4d4d8;
+  --accent: #38bdf8;
+  --border: #71717a;
+}
+
+.studio-shell {
+  background: var(--bg-primary);
+  color: var(--text-main);
+}
+
+/* Splash Screen */
+.splash-overlay {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at center, #1e1b4b, #090d16);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  color: #f8fafc;
+}
+.splash-card {
+  text-align: center;
+  padding: 2.5rem;
+  border: 1px solid #38bdf8;
+  border-radius: 16px;
+  background: rgba(15, 23, 42, 0.9);
+}
+
+/* Topbar & Workspace */
+.studio-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1.25rem;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border);
+  gap: 1rem;
+}
+.toolbar-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1;
+}
+.ingest-input {
+  flex: 1;
+  padding: 0.45rem 0.75rem;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-main);
+}
+.studio-workspace {
+  display: grid;
+  grid-template-columns: 1.35fr 1fr;
+  flex: 1;
+  overflow: hidden;
+}
+.manuscript-pane, .agent-chat-pane {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  overflow-y: auto;
+  border-right: 1px solid var(--border);
+}
+.paragraph-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+.paragraph-textarea {
+  width: 100%;
+  background: transparent;
+  color: var(--text-main);
+  border: none;
+  font-size: 1rem;
+  line-height: 1.6;
+  resize: vertical;
+}
+.chat-stream {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.chat-bubble {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.75rem;
+}
+.chat-input-row {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+.chat-input-row input {
+  flex: 1;
+  padding: 0.6rem;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-main);
+}
+
+/* Bottom Telemetry Drawer */
+.telemetry-drawer {
+  background: var(--bg-secondary);
+  border-top: 1px solid var(--border);
+}
+.drawer-header {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+}
+.drawer-logs {
+  height: 130px;
+  overflow-y: auto;
+  padding: 0.5rem 1rem;
+  font-family: monospace;
+  font-size: 0.82rem;
+}

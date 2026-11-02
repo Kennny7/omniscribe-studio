@@ -1,0 +1,24 @@
+# omniscribe-studio/services/shared-core/pyproject.toml
+[project]
+name = "shared-core"
+version = "1.0.0"
+description = "Shared Enterprise Multi-Engine Database Service, Schemas, and Telemetry Bus"
+requires-python = ">=3.12"
+dependencies = [
+    "pydantic>=2.9.0",
+    "pydantic-settings>=2.5.2",
+    "sqlalchemy[asyncio]>=2.0.35",
+    "asyncpg>=0.29.0",
+    "aiosqlite>=0.20.0",
+    "neo4j>=5.25.0",
+    "qdrant-client>=1.12.0",
+    "redis>=5.1.1",
+    "structlog>=24.4.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/shared_core"]

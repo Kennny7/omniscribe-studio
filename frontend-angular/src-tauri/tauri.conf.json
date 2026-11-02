@@ -1,0 +1,46 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "OmniScribe Studio",
+  "version": "1.0.0",
+  "identifier": "ai.omniscribe.daoforge",
+  "build": {
+    "beforeDevCommand": "npm run start",
+    "devUrl": "http://localhost:4200",
+    "beforeBuildCommand": "npm run build",
+    "frontendDist": "../dist/frontend-angular/browser"
+  },
+  "app": {
+    "withGlobalTauri": true,
+    "windows": [
+      {
+        "title": "OmniScribe Studio (Codename: DaoForge)",
+        "width": 1520,
+        "height": 940,
+        "minWidth": 1100,
+        "minHeight": 720,
+        "resizable": true,
+        "fullscreen": false,
+        "decorations": true,
+        "center": true,
+        "backgroundColor": "#0b0f19"
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; connect-src 'self' http://localhost:8000 ws://localhost:8000; img-src 'self' data: https:; style-src 'self' 'unsafe-inline';"
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "icon": [
+      "../../docs/assets/omniscribe-logo.svg",
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "category": "Productivity",
+    "shortDescription": "Autonomous Multi-Agent Literary Engine & World-Building Ecosystem",
+    "longDescription": "OmniScribe Studio (DaoForge) assists authors in writing, translating, and auditing novels across Wuxia, Xianxia, Fantasy, Sci-Fi, Horror, and Mature genres using 7B-15B local LLMs and Reinforcement Learning Trait DNA."
+  }
+}

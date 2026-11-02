@@ -1,0 +1,165 @@
+<!-- omniscribe-studio/frontend-angular/src/app/app.component.html -->
+<div class="studio-shell" [ngClass]="activeTheme()">
+
+  <!-- Animated Desktop Splash / Loading Screen -->
+  @if (isBooting()) {
+    <div class="splash-overlay">
+      <div class="splash-card">
+        <div class="splash-logo-ring">OmniScribe</div>
+        <h1>OmniScribe Studio</h1>
+        <p class="codename">CODENAME: DAOFORGE - MULTI-AGENT LITERARY ENGINE</p>
+        <div class="splash-progress-bar"><div class="splash-fill"></div></div>
+        <span class="boot-status">{{ bootStatusText() }}</span>
+      </div>
+    </div>
+  }
+
+  <!-- Top Studio Header Bar -->
+  <header class="studio-topbar">
+    <div class="brand-group">
+      <span class="brand-icon">[OS]</span>
+      <div>
+        <strong>OmniScribe Studio</strong>
+        <span class="badge-codename">DaoForge v1.0</span>
+      </div>
+    </div>
+
+    <!-- Genre, Uncensored Route, & Ingestion Controls -->
+    <div class="toolbar-controls">
+      <label>
+        Genre:
+        <select [ngModel]="selectedGenre()" (ngModelChange)="selectedGenre.set($event)">
+          @for (g of genres; track g) {
+            <option [value]="g">{{ g | uppercase }}</option>
+          }
+        </select>
+      </label>
+
+      <label class="uncensored-toggle" title="Route mature/gore/dark scenes to local uncensored 12B/14B weights">
+        <input type="checkbox" [ngModel]="useUncensoredModel()" (ngModelChange)="useUncensoredModel.set($event)" />
+        <span>Uncensored Model (Nyx 14B)</span>
+      </label>
+
+      <input
+        type="text"
+        class="ingest-input"
+        placeholder="Local folder path or Web Novel URL (twkan / 69shuba / WTR)..."
+        [ngModel]="scrapeUrlOrDir()"
+        (ngModelChange)="scrapeUrlOrDir.set($event)"
+      />
+      <button class="btn-primary" (click)="polishChapterParallel()">
+        Parallel Batch Polish (Anti-Cliche)
+      </button>
+    </div>
+
+    <!-- Instant Theme Switcher (Light Parchment / Dark Obsidian / Grey Studio) -->
+    <div class="theme-switcher">
+      <button [class.active]="activeTheme() === 'theme-light'" (click)="setTheme('theme-light')">Light</button>
+      <button [class.active]="activeTheme() === 'theme-grey'" (click)="setTheme('theme-grey')">Grey</button>
+      <button [class.active]="activeTheme() === 'theme-dark'" (click)="setTheme('theme-dark')">Dark</button>
+    </div>
+  </header>
+
+  <!-- Main Split Workspace: Left Manuscript Editor | Right Parallel Agent Council -->
+  <main class="studio-workspace">
+
+    <!-- Left Pane: Paragraph-by-Paragraph Versioned Editor -->
+    <section class="manuscript-pane">
+      <div class="pane-header">
+        <h2>Chapter Manuscript (Granular Paragraph Versioning & Undo)</h2>
+        <span class="version-hint">No em-dashes (-) or semicolons (;) - Parallel Chunking Active</span>
+      </div>
+
+      <div class="paragraph-list">
+        @for (p of paragraphs(); track p.paragraph_index) {
+          <div class="paragraph-card">
+            <div class="paragraph-meta">
+              <span>Section {{ p.paragraph_index + 1 }} - Version v{{ p.version }}</span>
+              <div class="para-actions">
+                <button class="btn-mini" (click)="undoParagraph(p.paragraph_index)" title="Revert to previous paragraph version">
+                  Undo (v{{ p.version }})
+                </button>
+              </div>
+            </div>
+            <textarea
+              rows="3"
+              [(ngModel)]="p.edited"
+              class="paragraph-textarea"
+            ></textarea>
+            <div class="raw-preview">Raw/Source: {{ p.original }}</div>
+          </div>
+        }
+      </div>
+    </section>
+
+    <!-- Right Pane: Non-Blocking Parallel Multi-Agent Writer's Room -->
+    <aside class="agent-chat-pane">
+      <div class="pane-header">
+        <h2>Multi-Agent Council (Parallel Chat)</h2>
+        @if (activeTasksCount() > 0) {
+          <span class="active-spinner">{{ activeTasksCount() }} agent(s) working in background...</span>
+        }
+      </div>
+
+      <div class="chat-stream">
+        @for (msg of chatMessages(); track $index) {
+          <div class="chat-bubble" [class.author-bubble]="msg.sender_id === 'author'">
+            <div class="chat-bubble-header">
+              <strong>{{ msg.sender_name }}</strong>
+              <span class="chat-time">{{ msg.timestamp }}</span>
+            </div>
+            <p>{{ msg.content }}</p>
+            @if (msg.sender_id !== 'author') {
+              <div class="rl-feedback-bar">
+                <span>RL Trait Feedback:</span>
+                <button (click)="rateAgent('good', msg.sender_id)">+1 /rate good</button>
+                <button (click)="rateAgent('bad', msg.sender_id)">-1 /rate bad</button>
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      <!-- Non-Blocking Chat Input (Never disabled while agents generate) -->
+      <div class="chat-input-row">
+        <input
+          type="text"
+          placeholder="Ask another task while agents reply (e.g. '@kael_blades choreograph the saber duel' or 'predict next chapter')..."
+          [ngModel]="chatInput()"
+          (ngModelChange)="chatInput.set($event)"
+          (keydown.enter)="sendParallelChatMessage()"
+        />
+        <button class="btn-send" (click)="sendParallelChatMessage()">Send Enter</button>
+      </div>
+    </aside>
+  </main>
+
+  <!-- Bottom Collapsible Live Telemetry & Progress Tracker Drawer -->
+  <footer class="telemetry-drawer" [class.collapsed]="!isLogDrawerOpen()">
+    <div class="drawer-header" (click)="isLogDrawerOpen.set(!isLogDrawerOpen())">
+      <div class="drawer-title">
+        <span>Live Telemetry & Progress Log Box</span>
+        <div class="mini-progress-wrap">
+          <div class="mini-progress-fill" [style.width.%]="overallProgress()"></div>
+        </div>
+        <span>{{ overallProgress() }}%</span>
+      </div>
+      <button class="btn-mini">{{ isLogDrawerOpen() ? 'Collapse' : 'Expand Logs' }}</button>
+    </div>
+
+    @if (isLogDrawerOpen()) {
+      <div class="drawer-logs">
+        @for (log of telemetryLogs(); track $index) {
+          <div class="log-line">
+            <span class="log-time">[{{ log.timestamp | slice:11:19 }}]</span>
+            <span class="log-service">[{{ log.service }}]</span>
+            <span class="log-msg">{{ log.message }}</span>
+          </div>
+        } @empty {
+          <div class="log-line">Ready. Waiting for parallel batch translation, scraping, or RL trait evolution events...</div>
+        }
+      </div>
+    }
+  </footer>
+
+</div>

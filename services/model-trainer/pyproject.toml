@@ -1,0 +1,17 @@
+# omniscribe-studio/services/model-trainer/pyproject.toml
+[project]
+name = "model-trainer"
+version = "1.0.0"
+description = "Incremental QLoRA dataset generator and Unsloth adapter trainer for 7B-15B local models"
+requires-python = ">=3.12"
+dependencies = [
+    "shared-core",
+    "structlog>=24.4.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/model_trainer"]

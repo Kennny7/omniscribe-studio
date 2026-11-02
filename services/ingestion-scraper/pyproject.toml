@@ -1,0 +1,23 @@
+# omniscribe-studio/services/ingestion-scraper/pyproject.toml
+[project]
+name = "ingestion-scraper"
+version = "1.0.0"
+description = "Multi-format novel parser (EPUB/PDF/DOCX/MD), chapter sequencer, FlareSolverr web connector, and Genre Tagger"
+requires-python = ">=3.12"
+dependencies = [
+    "shared-core",
+    "beautifulsoup4>=4.12.3",
+    "ebooklib>=0.18",
+    "pypdf>=5.0.1",
+    "python-docx>=1.1.2",
+    "httpx>=0.27.2",
+    "litellm>=1.50.0",
+    "tenacity>=9.0.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/ingestion_scraper"]
