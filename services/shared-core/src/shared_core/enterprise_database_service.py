@@ -58,14 +58,14 @@ class TraitEvolutionLogModel(Base):
     timestamp = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
 
-class ChapterParagraphVersionModel(Base):
+class ParagraphVersionModel(Base):
     __tablename__ = "chapter_paragraph_versions"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     project_id = Column(String(64), nullable=False, index=True)
     chapter_id = Column(String(64), nullable=False, index=True)
     paragraph_index = Column(Integer, nullable=False)
-    version = Column(Integer, nullable=False)
+    version_number = Column(Integer, nullable=False)
     raw_content = Column(Text, nullable=False)
     styled_content = Column(Text, nullable=False)
     author_agent_id = Column(String(64), nullable=False)
