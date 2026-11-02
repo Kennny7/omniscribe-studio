@@ -1,4 +1,4 @@
-<!-- omniscribe-studio/frontend-angular/src/app/app.component.html -->
+# omniscribe-studio/frontend-angular/src/app/app.component.html
 <div class="studio-shell" [ngClass]="activeTheme()">
 
   <!-- Animated Desktop Splash / Loading Screen -->
@@ -22,6 +22,15 @@
         <strong>OmniScribe Studio</strong>
         <span class="badge-codename">DaoForge v1.0</span>
       </div>
+    </div>
+
+    <!-- Live Docker / Local Storage Status Pill & Settings Toggle -->
+    <div class="engine-status-pill" (click)="toggleSettingsModal()" title="Click to view Docker services health & switch storage backend">
+      <span class="status-indicator" [class.online]="serviceHealth().storage_target === 'docker'" [class.fallback]="serviceHealth().storage_target === 'local'"></span>
+      <span class="status-label">
+        Storage: {{ serviceHealth().storage_target === 'docker' ? 'Docker Services' : 'Local SQLite Lite' }}
+      </span>
+      <button class="btn-micro" (click)="toggleSettingsModal(); $event.stopPropagation()">Configure</button>
     </div>
 
     <!-- Genre, Uncensored Route, & Ingestion Controls -->
@@ -59,6 +68,91 @@
       <button [class.active]="activeTheme() === 'theme-dark'" (click)="setTheme('theme-dark')">Dark</button>
     </div>
   </header>
+
+  <!-- Settings & Docker Status Configuration Modal -->
+  @if (isSettingsOpen()) {
+    <div class="modal-backdrop" (click)="toggleSettingsModal()">
+      <div class="modal-card" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h3>Engine & Storage Configuration</h3>
+          <button class="btn-close" (click)="toggleSettingsModal()">X</button>
+        </div>
+
+        <div class="modal-body">
+          <p class="modal-desc">
+            Monitor Docker container services status and switch between Docker persistence services (Postgres, Neo4j, Qdrant, Redis) and Local Lite storage (zero-configuration SQLite fallback).
+          </p>
+
+          <div class="storage-switch-box">
+            <span class="box-label">Active Storage Target:</span>
+            <div class="button-toggle-group">
+              <button
+                class="btn-switch"
+                [class.active]="serviceHealth().storage_target === 'docker'"
+                (click)="switchStorageTarget('docker')"
+              >
+                Docker Services (PostgreSQL + Neo4j + Qdrant + Redis)
+              </button>
+              <button
+                class="btn-switch"
+                [class.active]="serviceHealth().storage_target === 'local'"
+                (click)="switchStorageTarget('local')"
+              >
+                Local Lite Mode (SQLite data/trait_engine/traits.db)
+              </button>
+            </div>
+          </div>
+
+          <div class="services-status-grid">
+            <div class="service-item">
+              <div class="item-header">
+                <strong>PostgreSQL 16</strong>
+                <span class="badge" [class.badge-success]="serviceHealth().services?.postgres?.connected" [class.badge-warn]="!serviceHealth().services?.postgres?.connected">
+                  {{ serviceHealth().services?.postgres?.status || 'local_fallback' }}
+                </span>
+              </div>
+              <span class="item-detail">{{ serviceHealth().services?.postgres?.target || 'data/trait_engine/traits.db' }}</span>
+            </div>
+
+            <div class="service-item">
+              <div class="item-header">
+                <strong>Neo4j 5 Graph</strong>
+                <span class="badge" [class.badge-success]="serviceHealth().services?.neo4j?.connected" [class.badge-muted]="!serviceHealth().services?.neo4j?.connected">
+                  {{ serviceHealth().services?.neo4j?.status || 'offline' }}
+                </span>
+              </div>
+              <span class="item-detail">{{ serviceHealth().services?.neo4j?.target || 'In-Memory Lore Graph Mock' }}</span>
+            </div>
+
+            <div class="service-item">
+              <div class="item-header">
+                <strong>Qdrant Vector DB</strong>
+                <span class="badge" [class.badge-success]="serviceHealth().services?.qdrant?.connected" [class.badge-muted]="!serviceHealth().services?.qdrant?.connected">
+                  {{ serviceHealth().services?.qdrant?.status || 'offline' }}
+                </span>
+              </div>
+              <span class="item-detail">{{ serviceHealth().services?.qdrant?.target || 'In-Memory Vector Store' }}</span>
+            </div>
+
+            <div class="service-item">
+              <div class="item-header">
+                <strong>Redis 7.4 Bus</strong>
+                <span class="badge" [class.badge-success]="serviceHealth().services?.redis?.connected" [class.badge-muted]="!serviceHealth().services?.redis?.connected">
+                  {{ serviceHealth().services?.redis?.status || 'offline' }}
+                </span>
+              </div>
+              <span class="item-detail">{{ serviceHealth().services?.redis?.target || 'Local Async Event Loop' }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn-primary" (click)="refreshHealthStatus()">Refresh Status</button>
+          <button class="btn-secondary" (click)="toggleSettingsModal()">Close</button>
+        </div>
+      </div>
+    </div>
+  }
 
   <!-- Main Split Workspace: Left Manuscript Editor | Right Parallel Agent Council -->
   <main class="studio-workspace">
