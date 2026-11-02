@@ -28,6 +28,26 @@ export interface TelemetryEvent {
   progress?: number;
 }
 
+export interface ServiceDetail {
+  connected: boolean;
+  target: string;
+  status: string;
+}
+
+export interface ServiceHealthStatus {
+  status?: string;
+  codename?: string;
+  storage_target: 'docker' | 'local';
+  sqlite_fallback_active: boolean;
+  force_local_mode: boolean;
+  services?: {
+    postgres?: ServiceDetail;
+    neo4j?: ServiceDetail;
+    qdrant?: ServiceDetail;
+    redis?: ServiceDetail;
+  };
+}
+
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -40,6 +60,20 @@ export class AppComponent implements OnInit {
   isBooting = signal<boolean>(true);
   bootStatusText = signal<string>('Initializing DaoForge Polyglot Engines (Postgres, Neo4j, Qdrant)...');
   activeTheme = signal<StudioTheme>('theme-dark');
+
+  // Service Health & Storage Backend Configuration
+  isSettingsOpen = signal<boolean>(false);
+  serviceHealth = signal<ServiceHealthStatus>({
+    storage_target: 'local',
+    sqlite_fallback_active: true,
+    force_local_mode: false,
+    services: {
+      postgres: { connected: false, target: 'data/trait_engine/traits.db', status: 'local_fallback' },
+      neo4j: { connected: false, target: 'In-Memory Lore Graph Mock', status: 'offline' },
+      qdrant: { connected: false, target: 'In-Memory Vector Store', status: 'offline' },
+      redis: { connected: false, target: 'Direct Local Async Event Loop', status: 'offline' },
+    }
+  });
 
   // Project & Genre Configuration
   projectId = signal<string>('immortal-sovereign-vol1');
@@ -90,6 +124,7 @@ export class AppComponent implements OnInit {
   private readonly apiBase = 'http://localhost:8000';
 
   ngOnInit(): void {
+    this.refreshHealthStatus();
     this.connectWebSocketStreams();
     setTimeout(() => {
       this.bootStatusText.set('Trait DNA Engine & 14B/Dao-9B Routers Online.');
@@ -99,6 +134,53 @@ export class AppComponent implements OnInit {
 
   setTheme(theme: StudioTheme): void {
     this.activeTheme.set(theme);
+  }
+
+  toggleSettingsModal(): void {
+    this.isSettingsOpen.update((v) => !v);
+    if (this.isSettingsOpen()) {
+      this.refreshHealthStatus();
+    }
+  }
+
+  async refreshHealthStatus(): Promise<void> {
+    try {
+      const res = await fetch(`${this.apiBase}/api/health`);
+      if (res.ok) {
+        const data = await res.json();
+        this.serviceHealth.set({
+          storage_target: data.storage_target || (data.sqlite_fallback_active ? 'local' : 'docker'),
+          sqlite_fallback_active: !!data.sqlite_fallback_active,
+          force_local_mode: !!data.force_local_mode,
+          services: data.services || this.serviceHealth().services,
+        });
+      }
+    } catch {
+      // In offline / preview mode keep default fallback state
+    }
+  }
+
+  async switchStorageTarget(mode: 'docker' | 'local'): Promise<void> {
+    try {
+      const res = await fetch(`${this.apiBase}/api/settings/storage-mode`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mode })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        this.serviceHealth.set({
+          storage_target: data.storage_target || mode,
+          sqlite_fallback_active: !!data.sqlite_fallback_active,
+          force_local_mode: !!data.force_local_mode,
+          services: data.services || this.serviceHealth().services,
+        });
+      } else {
+        await this.refreshHealthStatus();
+      }
+    } catch {
+      this.serviceHealth.update((curr) => ({ ...curr, storage_target: mode }));
+    }
   }
 
   connectWebSocketStreams(): void {
