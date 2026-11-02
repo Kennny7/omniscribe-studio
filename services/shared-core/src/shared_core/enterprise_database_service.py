@@ -51,8 +51,8 @@ class TraitEvolutionLogModel(Base):
     log_id = Column(Integer, primary_key=True, autoincrement=True)
     agent_id = Column(String(64), nullable=False, index=True)
     previous_traits = Column(JSON, nullable=False)
-    updated_traits = Column(JSON, nullable=False)
-    deltas = Column(JSON, nullable=False)
+    new_traits = Column(JSON, nullable=False)
+    delta_applied = Column(JSON, nullable=False)
     trigger_channel = Column(String(32), nullable=False)  # explicit | implicit_edit_distance
     reason = Column(Text, nullable=True)
     timestamp = Column(DateTime, default=lambda: datetime.now(timezone.utc))
