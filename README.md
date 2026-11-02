@@ -1,13 +1,56 @@
-# OmniScribe Studio (Codename: DaoForge)
+<div align="center">
 
-Autonomous Multi-Agent Literary Engine, World-Building Knowledge Graph, and Reinforcement Learning Manuscript Suite for Professional Novelists.
+  <img src="docs/assets/omniscribe-logo.svg" alt="OmniScribe Studio Logo" width="130" height="130" />
 
----
+  # OmniScribe Studio (*Codename: DaoForge*)
+  **Autonomous Multi-Agent Literary Engine, World-Building Graph & RL Manuscript Suite**
+
+  [![Python 3.12+](https://img.shields.io/badge/Python-3.12%2B-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
+  [![uv Workspace](https://img.shields.io/badge/uv-Workspace-DE5FE9?style=for-the-badge&logo=astral&logoColor=white)](https://docs.astral.sh/uv/)
+  [![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
+  [![Angular 19](https://img.shields.io/badge/Angular_19-DD0031?style=for-the-badge&logo=angular&logoColor=white)](https://angular.dev)
+  [![Neo4j](https://img.shields.io/badge/Neo4j-018bff?style=for-the-badge&logo=neo4j&logoColor=white)](https://neo4j.com)
+  [![License](https://img.shields.io/badge/License-Apache_2.0-green?style=for-the-badge)](LICENSE)
+
+  ---
+
+  <!-- Top Horizontal Interactive Navigation Bar -->
+  <p align="center">
+    <a href="#overview"><kbd> Overview </kbd></a> •
+    <a href="#system-architecture"><kbd> Architecture </kbd></a> •
+    <a href="#project-tree-structure"><kbd> Project Tree </kbd></a> •
+    <a href="#complete-quick-start-guide"><kbd> Quick Start </kbd></a> •
+    <a href="#docker-services-and-storage-backend-switching"><kbd> Docker & Storage Switch </kbd></a> •
+    <a href="docs/ARCHITECTURE.md"><kbd> Architecture Spec </kbd></a> •
+    <a href="docs/CONTRIBUTING.md"><kbd> Contributing </kbd></a>
+  </p>
+
+  <!-- Interactive Document Links -->
+  <p align="center">
+    <a href="services/shared-core/pyproject.toml"><kbd> shared-core </kbd></a> |
+    <a href="services/core-gateway/src/core_gateway/main.py"><kbd> core-gateway </kbd></a> |
+    <a href="services/ingestion-scraper/src/ingestion_scraper/site_adapters.py"><kbd> ingestion-scraper </kbd></a> |
+    <a href="services/agent-swarm/src/agent_swarm/trait_engine.py"><kbd> agent-swarm </kbd></a> |
+    <a href="services/manuscript-editor/src/manuscript_editor/editor_engine.py"><kbd> manuscript-editor </kbd></a> |
+    <a href="services/rag-lore-engine/src/rag_lore_engine/lore_auditor.py"><kbd> rag-lore-engine </kbd></a> |
+    <a href="services/model-trainer/src/model_trainer/unsloth_trainer.py"><kbd> model-trainer </kbd></a>
+  </p>
+
+  ---
+</div>
 
 ## Table of Contents
 
 - [Overview](#overview)
 - [System Architecture](#system-architecture)
+- [Project Tree Structure](#project-tree-structure)
+- [Complete Quick Start Guide](#complete-quick-start-guide)
+  - [Step 1: Environment Configuration](#step-1-environment-configuration)
+  - [Step 2: Install Python 3.12 and Sync uv Workspace](#step-2-install-python-312-and-sync-uv-workspace)
+  - [Step 3: Start Docker Persistence Infrastructure](#step-3-start-docker-persistence-infrastructure)
+  - [Step 4: Launch Core Gateway Backend (Hot Reload)](#step-4-launch-core-gateway-backend-hot-reload)
+  - [Step 5: Launch Frontend Interface (Angular / Desktop)](#step-5-launch-frontend-interface-angular--desktop)
+- [Docker Services and Storage Backend Switching](#docker-services-and-storage-backend-switching)
 - [Microservices Breakdown](#microservices-breakdown)
   - [1. shared-core](#1-serviceshared-core)
   - [2. core-gateway](#2-servicescore-gateway)
@@ -21,9 +64,7 @@ Autonomous Multi-Agent Literary Engine, World-Building Knowledge Graph, and Rein
 - [Multi-Format File Ingestion and Scalable Web Scraping](#multi-format-file-ingestion-and-scalable-web-scraping)
 - [Reinforcement Learning and 15-Dimension Trait DNA Engine](#reinforcement-learning-and-15-dimension-trait-dna-engine)
 - [Open Source Models for Novel Writing and Translation](#open-source-models-for-novel-writing-and-translation)
-- [User Interfaces: Flutter UI and Angular Desktop UI](#user-interfaces-flutter-ui-and-angular-desktop-ui)
-- [Prerequisites and uv Environment Setup](#prerequisites-and-uv-environment-setup)
-- [Docker Services and Volume Management](#docker-services-and-volume-management)
+- [User Interfaces: Flutter and Angular Desktop UI](#user-interfaces-flutter-and-angular-desktop-ui)
 - [Running the Test Suite](#running-the-test-suite)
 - [API Reference](#api-reference)
 - [License](#license)
@@ -32,15 +73,17 @@ Autonomous Multi-Agent Literary Engine, World-Building Knowledge Graph, and Rein
 
 ## Overview
 
-OmniScribe Studio is an enterprise-grade AI literary ecosystem and microservice workspace designed specifically for authors, web-novel writers, and translators. It solves the critical limitations of standard chatbots when writing long-form novels:
+**OmniScribe Studio** is a production-grade AI literary ecosystem and microservice workspace designed specifically for authors, novelists, and translators writing across **Xianxia, Wuxia, Xuanhuan, Western Fantasy, LitRPG/Progression, Cyberpunk, Steampunk, Sci-Fi, Romance, Historical Fiction, Urban Supernatural, Horror, Mystery, and Dark/Mature Fiction**.
 
-1. **Genre Mastery Across All Themes:** Full native support for Xianxia, Wuxia, Xuanhuan, Western Fantasy, LitRPG/Progression, Cyberpunk, Steampunk, Sci-Fi, Romance, Historical Fiction, Urban Supernatural, Horror, Mystery/Thriller, and Dark/Mature Fiction.
-2. **Zero Chatbot Cliches:** Strips em-dashes (`—`), semicolons (`;`), and repetitive assistant phrasing (`a testament to`, `a shiver ran down his spine`, `couldn't help but`) via grammar and AST scrubbers.
-3. **Reinforced Personality Evolution (Trait DNA):** Writing agents are not static system prompts. Each agent is governed by a 15-dimension numerical trait vector that dynamically generates prompting instructions and continuously self-tunes via author feedback and implicit edit distance.
-4. **Universal Ingestion and Anti-Duplication:** Parses files from local systems (`.epub`, `.pdf`, `.docx`, `.md`, `.txt`, and raw chapter folders) and scrapes web novels from sources like Twkan, 69shuba, WTR-Lab, OpenNovel, and Project Gutenberg with automated DOM noise removal and deduplication.
-5. **Continuous Model Training and Fine-Tuning:** Transforms accepted prose, polished chapters, and crawled web novels into continuation instruction datasets with automated scripts for 4-bit QLoRA fine-tuning with Unsloth.
-6. **Granular Paragraph Versioning:** Every paragraph has individual version tracking, diff calculation, and one-click rollback to prevent deadlock during editing.
-7. **No Content Restrictions:** Dedicated uncensored model routing (`Nyx 14B`, `Dolphin Mistral-Nemo 12B`) guarantees that gritty battles, dark horror, visceral descriptions, and mature themes remain unneutered.
+Standard general-purpose chatbots fall short when generating multi-volume book manuscripts: they hallucinate continuity details, inject repetitive chatbot cliches, fail to capture authentic genre terminology, and self-censor mature or gritty combat scenes. OmniScribe Studio resolves these issues through specialized architecture:
+
+1. **Zero Chatbot Cliches:** Strips em-dashes (`—`), semicolons (`;`), and robotic phrasing (`a testament to`, `a shiver ran down his spine`, `couldn't help but`) via grammar and AST scrubbers.
+2. **Reinforced Personality Evolution (Trait DNA):** Writing agents are not static system prompts. Each agent is governed by a 15-dimension numerical trait vector that dynamically compiles prompting directives and continuously self-tunes via author feedback and implicit edit distance.
+3. **Universal Ingestion and Anti-Duplication:** Parses files from local systems (`.epub`, `.pdf`, `.docx`, `.md`, `.txt`, and raw chapter folders) and scrapes web novels from sources like Twkan, 69shuba, WTR-Lab, OpenNovel, and Project Gutenberg with automated DOM noise removal and SHA-256 deduplication.
+4. **Continuous Model Training and Fine-Tuning:** Transforms accepted prose, polished chapters, and crawled web novels into continuation instruction datasets with automated scripts for 4-bit QLoRA fine-tuning with Unsloth.
+5. **Granular Paragraph Versioning:** Every paragraph has individual version tracking, diff calculation, and one-click rollback to prevent deadlock during editing.
+6. **No Content Restrictions:** Dedicated uncensored model routing (`Nyx 14B`, `Dolphin Mistral-Nemo 12B`) guarantees that gritty battles, dark horror, visceral descriptions, and mature themes remain unneutered.
+7. **Storage Backend Flexibility:** Live UI status indicator with a configuration modal showing whether Docker persistence services (Postgres, Neo4j, Qdrant, Redis) are online or falling back to local SQLite lite mode (`data/trait_engine/traits.db`), with instant manual switching.
 
 ---
 
@@ -48,48 +91,245 @@ OmniScribe Studio is an enterprise-grade AI literary ecosystem and microservice 
 
 OmniScribe Studio is architected as an event-driven microservices workspace powered by Python 3.12, Astral `uv`, Redis 7.4 Streams, PostgreSQL 16 (with automatic zero-config SQLite failover), Neo4j 5 Graph Database, and Qdrant Vector Search.
 
+```mermaid
+flowchart TD
+    subgraph Clients["Presentation & Desktop Clients"]
+        Angular["Angular 19 Desktop / Tauri UI"]
+        Flutter["Flutter Cross-Platform Client"]
+    end
+
+    subgraph Gateway["Core Gateway Service (Port 8000)"]
+        FastAPI["FastAPI REST Router"]
+        WSMux["WebSocket Stream Multiplexer (/ws/stream)"]
+    end
+
+    subgraph Bus["Message Bus & Streaming Queue"]
+        RedisPub["Redis 7.4 Pub/Sub (chat_stream, telemetry_stream)"]
+    end
+
+    subgraph Microservices["Microservice Engines (uv Workspace)"]
+        Ingest["ingestion-scraper (EPUB/PDF/DOCX/Web)"]
+        Trans["translation-pipeline (Dao-9B Raw Polish)"]
+        Editor["manuscript-editor (Paragraph Diff & Versioning)"]
+        Swarm["agent-swarm (15-Dim Trait DNA & Council)"]
+        Lore["rag-lore-engine (GraphRAG & Plot Audit)"]
+        Trainer["model-trainer (Unsloth QLoRA 4-bit)"]
+    end
+
+    subgraph Storage["Storage & Persistence Target Switcher"]
+        PG[("PostgreSQL 16 (Primary)")]
+        SQLite[("Local SQLite Lite (traits.db Fallback)")]
+        Neo[("Neo4j 5 Knowledge Graph")]
+        Qdrant[("Qdrant Vector Database")]
+    end
+
+    Angular <-->|REST & WebSocket| Gateway
+    Flutter <-->|REST & WebSocket| Gateway
+    Gateway <--> RedisPub
+    RedisPub <--> Microservices
+    Microservices <--> Storage
+```
+
+---
+
+## Project Tree Structure
+
+<details open>
+<summary><b>Click to Expand / Collapse Complete Project Tree</b></summary>
+
 ```text
-+-----------------------------------------------------------------------------------+
-|                           Client Applications & UIs                               |
-|   - Angular 19 + Tauri Desktop UI (Parchment, Dark Obsidian, Neutral Grey Modes)   |
-|   - Flutter Cross-Platform UI (Desktop, Tablet, and Mobile Access)                |
-+-----------------------------------------------------------------------------------+
-                                         |
-                                         v  WebSocket / REST API
-+-----------------------------------------------------------------------------------+
-|                        Core Gateway (services/core-gateway)                       |
-|   - FastAPI High-Throughput HTTP REST Router                                      |
-|   - Non-Blocking WebSocket Multiplexer (/ws/studio, /ws/telemetry)                |
-+-----------------------------------------------------------------------------------+
-                                         |
-                                         v  Redis Streams & Pub/Sub
-+-----------------------------------------------------------------------------------+
-|                           Independent Microservices                               |
-|                                                                                   |
-|  +--------------------+  +--------------------+  +--------------------+           |
-|  | ingestion-scraper  |  | translation-pipe   |  |   manuscript-editor|           |
-|  | - EPUB/PDF/DOCX/MD |  | - Dao-9B raw MTL   |  | - Paragraph Diffs  |           |
-|  | - Web Scrapers     |  | - Term glossary    |  | - Anti-Cliche      |           |
-|  | - SHA256 Dedupe    |  | - Parallel batch   |  | - Deadlock check   |           |
-|  +--------------------+  +--------------------+  +--------------------+           |
-|                                                                                   |
-|  +--------------------+  +--------------------+  +--------------------+           |
-|  |    agent-swarm     |  |  rag-lore-engine   |  |    model-trainer   |           |
-|  | - 15-Dim Trait DNA |  | - Neo4j GraphRAG   |  | - QLoRA Fine-Tune  |           |
-|  | - Dynamic Prompts  |  | - Vector Memory    |  | - Unsloth 4-bit    |           |
-|  | - RL Feedback Bus  |  | - Entity Tracker   |  | - Dataset builder  |           |
-|  +--------------------+  +--------------------+  +--------------------+           |
-+-----------------------------------------------------------------------------------+
-                                         |
-                                         v
-+-----------------------------------------------------------------------------------+
-|                     Shared Storage & Engine Infrastructure                        |
-|   - Relational: PostgreSQL 16 (Primary) + data/trait_engine/traits.db (SQLite)     |
-|   - Knowledge Graph: Neo4j 5 (Character Profiles, Relationships, Sect Factions)   |
-|   - Semantic Vector Store: Qdrant (Lore chunks, Scene embeddings, 1024-dim)       |
-|   - Event & Message Bus: Redis 7.4 (Pub/Sub & Telemetry Streams)                  |
-|   - FlareSolverr: Cloudflare / Anti-Bot Bypass for Protected Web Ingestion        |
-+-----------------------------------------------------------------------------------+
+omniscribe-studio/
+├── .env.example                               # Environment template with preconfigured ports & credentials
+├── .env                                       # Active local environment variables
+├── .gitignore                                 # Git rules excluding docker mounts, .venv, node_modules
+├── .python-version                            # Pinned Python version (3.12)
+├── docker-compose.yml                         # Multi-container orchestration (Postgres, Neo4j, Qdrant, Redis, FlareSolverr)
+├── pyproject.toml                             # Root Astral uv workspace configuration
+├── README.md                                  # Complete project documentation
+├── data/                                      # Polyglot persistent storage mounts & generated datasets
+│   ├── lora_adapters/                         # Generated Unsloth fine-tuning scripts and LoRA weights
+│   ├── neo4j/                                 # Neo4j graph data, logs, and import mounts
+│   ├── postgres/                              # PostgreSQL 16 database cluster files
+│   ├── qdrant/                                # Qdrant vector database storage
+│   ├── redis/                                 # Redis append-only files (AOF)
+│   ├── training_datasets/                     # Generated genre-tagged JSONL instruction pairs
+│   └── trait_engine/                          # Local SQLite lite fallback database and evolution logs
+│       ├── trait_evolution_log.jsonl          # Comprehensive audit trail of agent personality shifts
+│       └── traits.db                          # SQLite mirror and offline relational store
+├── docs/                                      # Architectural and contribution documentation
+│   ├── ARCHITECTURE.md                        # Technical architecture deep dive and state machines
+│   ├── CONTRIBUTING.md                        # Development setup and contributor guidelines
+│   └── assets/                                # Brand assets and studio logos
+│       └── omniscribe-logo.svg                # Vector SVG logo for splash screens and badges
+├── frontend-angular/                          # Angular 19 Desktop application with Tauri bindings
+│   ├── package.json                           # Frontend dependencies and scripts
+│   ├── src/                                   # Angular application source code
+│   │   ├── app/
+│   │   │   ├── app.component.css              # Custom styling for Dark Obsidian, Light Parchment, and Grey Studio modes
+│   │   │   ├── app.component.html             # Split-screen workspace, status pill, and modal template
+│   │   │   └── app.component.ts               # Component logic, storage switcher, and WebSocket handler
+│   │   ├── index.html                         # Root HTML entry point
+│   │   └── styles.css                         # Global CSS rules
+│   └── src-tauri/                             # Tauri configuration for desktop compilation
+├── services/                                  # Modular uv workspace microservices
+│   ├── agent-swarm/                           # 15-Dimension Trait DNA engine & parallel multi-agent council
+│   │   ├── pyproject.toml
+│   │   └── src/agent_swarm/
+│   │       ├── dynamic_prompt_builder.py      # Numerical vector to prompt instruction compiler
+│   │       ├── feedback_engine.py             # Explicit ratings and implicit edit distance processor
+│   │       ├── orchestrator.py                # Asynchronous agent task dispatcher
+│   │       ├── topic_router.py                # Contextual agent selection
+│   │       └── trait_engine.py                # Clamped boundary evolution and seed data
+│   ├── core-gateway/                          # FastAPI REST API and WebSocket hub
+│   │   ├── pyproject.toml
+│   │   └── src/core_gateway/
+│   │       └── main.py                        # REST routers, health diagnostics, and WebSocket multiplexer
+│   ├── ingestion-scraper/                     # Multi-format novel parser and web scrapers
+│   │   ├── pyproject.toml
+│   │   └── src/ingestion_scraper/
+│   │       ├── parser_and_scraper.py          # EPUB, PDF, DOCX, and directory parser
+│   │       └── site_adapters.py               # Adapters for Twkan, 69shuba, WTR, OpenNovel, Gutenberg
+│   ├── manuscript-editor/                     # Paragraph versioning and anti-cliche scrubber
+│   │   ├── pyproject.toml
+│   │   └── src/manuscript_editor/
+│   │       └── editor_engine.py               # Paragraph diff tracking, undo engine, and AST cleaner
+│   ├── model-trainer/                         # Continuous reinforcement and QLoRA fine-tuning
+│   │   ├── pyproject.toml
+│   │   └── src/model_trainer/
+│   │       └── unsloth_trainer.py             # Dataset exporter and Unsloth 4-bit script generator
+│   ├── rag-lore-engine/                       # GraphRAG knowledge graph and plotline auditor
+│   │   ├── pyproject.toml
+│   │   └── src/rag_lore_engine/
+│   │       └── lore_auditor.py                # Neo4j character tracker and plotline predictor
+│   ├── shared-core/                           # Enterprise database service and telemetry bus
+│   │   ├── pyproject.toml
+│   │   └── src/shared_core/
+│   │       ├── config.py                      # Centralized Pydantic Settings
+│   │       └── enterprise_database_service.py # PostgreSQL/SQLite failover and storage switcher
+│   └── translation-pipeline/                  # Dao-9B translation engine and MTL polisher
+│       ├── pyproject.toml
+│       └── src/translation_pipeline/
+│           └── translator.py                  # Parallel paragraph translation with term glossaries
+└── tests/                                     # Automated test suite
+    └── test_omniscribe_core.py                # Trait DNA bounds, prompt builder, anti-cliche, and extractor tests
+```
+
+</details>
+
+---
+
+## Complete Quick Start Guide
+
+Follow these steps to configure your environment, run the backend with hot reload, start the Docker services (or run in local lite mode), and launch the frontend.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Dev as Author / Developer
+    participant Env as .env Configuration
+    participant UV as Astral uv Workspace
+    participant Docker as Docker Containers
+    participant Backend as Core Gateway (Port 8000)
+    participant UI as Angular Desktop (Port 4200)
+
+    Dev->>Env: Copy .env.example to .env
+    Dev->>UV: uv sync (installs Python 3.12 dependencies)
+    Dev->>Docker: docker compose up -d (optional for Docker services)
+    Dev->>Backend: uv run --package core-gateway uvicorn core_gateway.main:app --reload
+    Backend-->>Dev: API online at http://localhost:8000 (auto-detects storage)
+    Dev->>UI: npx ng serve --open
+    UI-->>Dev: Studio opens at http://localhost:4200
+```
+
+### Step 1: Environment Configuration
+Copy the provided environment template to create your `.env` file:
+```bash
+# On Windows (PowerShell):
+Copy-Item .env.example .env
+
+# On Linux / macOS (Bash):
+cp .env.example .env
+```
+The preconfigured defaults work out-of-the-box for both local development and Docker deployment.
+
+### Step 2: Install Python 3.12 and Sync uv Workspace
+Ensure [Astral `uv`](https://docs.astral.sh/uv/) is installed on your system:
+```bash
+# Pin Python 3.12
+uv python pin 3.12
+
+# Synchronize all eight microservice dependencies in the workspace
+uv sync
+```
+
+### Step 3: Start Docker Persistence Infrastructure
+If you wish to use the full enterprise stack (PostgreSQL, Neo4j, Qdrant, Redis, and FlareSolverr):
+```bash
+docker compose up -d
+```
+*Note: If Docker is not running or you prefer a lightweight local setup, OmniScribe Studio automatically falls back to its built-in SQLite engine (`data/trait_engine/traits.db`). You do not need to install Postgres or Redis to start writing immediately.*
+
+### Step 4: Launch Core Gateway Backend (Hot Reload)
+Run the backend gateway with hot reload enabled on port 8000:
+```bash
+uv run --package core-gateway uvicorn core_gateway.main:app --reload --host 0.0.0.0 --port 8000
+```
+- Interactive API Documentation (Swagger UI): `http://localhost:8000/docs`
+- Service Health Diagnostics: `http://localhost:8000/api/health`
+
+### Step 5: Launch Frontend Interface (Angular / Desktop)
+Open a new terminal window, navigate to the frontend directory, install dependencies, and start the development server with live reload:
+```bash
+cd frontend-angular
+npm install
+npx ng serve --open
+```
+The studio workspace will open automatically at `http://localhost:4200`.
+
+---
+
+## Docker Services and Storage Backend Switching
+
+OmniScribe Studio provides dual-mode data persistence:
+1. **Docker Services Mode (Enterprise Stack):**
+   - **PostgreSQL 16**: Primary storage for agent trait DNA, manuscripts, and version histories.
+   - **Neo4j 5**: Knowledge graph tracking character profiles, sect relationships, and cultivation realm trees.
+   - **Qdrant**: Vector database providing semantic search across previous chapters and lore files.
+   - **Redis 7.4**: High-throughput Pub/Sub bus broadcasting parallel agent chat and telemetry logs.
+   - **FlareSolverr**: Headless browser proxy bypassing Cloudflare protections on crawled novel sites.
+2. **Local Lite Mode (Zero-Config Fallback):**
+   - **SQLite**: Local file database at `data/trait_engine/traits.db` storing all agent traits, paragraph version diffs, and evolution logs.
+   - **In-Memory Graphs & Vectors**: Lightweight local mocks allowing the editor to function completely offline without Docker.
+
+### Live UI Status & Manual Storage Switcher
+In the top header of the UI, an interactive status pill indicates the current storage destination:
+- **Green Indicator ("Storage: Docker Services")**: Data is streaming to the active Docker containers.
+- **Amber Indicator ("Storage: Local SQLite Lite")**: Data is saved to the local `data/trait_engine/traits.db` SQLite database.
+
+Clicking the **"Configure"** button opens the **Engine & Storage Configuration Modal**, where authors can:
+- View the real-time connectivity status of PostgreSQL, Neo4j, Qdrant, and Redis.
+- Manually switch between **Docker Services** and **Local Lite Mode** with a single click.
+
+```mermaid
+graph LR
+    subgraph UI["Studio Header"]
+        Pill["Status Pill: Docker / Local"]
+        Modal["Configuration Modal"]
+    end
+
+    subgraph API["Backend API Router"]
+        HealthEndpoint["GET /api/health"]
+        SwitchEndpoint["POST /api/settings/storage-mode"]
+    end
+
+    subgraph Service["shared-core Database Service"]
+        StorageSwitcher["EnterpriseDatabaseService.set_storage_mode()"]
+    end
+
+    Pill -->|Click| Modal
+    Modal -->|Read Status| HealthEndpoint
+    Modal -->|Toggle Mode| SwitchEndpoint
+    SwitchEndpoint --> StorageSwitcher
 ```
 
 ---
@@ -104,7 +344,7 @@ The foundational layer shared across all microservices:
 
 ### 2. `services/core-gateway`
 The unified entry point for client applications:
-- **REST Endpoints**: Chapter ingestion, full-novel translation triggers, plotline planning, character profile generation, and model training invocation.
+- **REST Endpoints**: Chapter ingestion, full-novel translation triggers, plotline planning, character profile generation, storage mode switching, and model training invocation.
 - **WebSocket Hub**: Supports non-blocking multiplexed bidirectional communication. Authors can continue prompting, editing, and dispatching tasks while agents compute in the background.
 
 ### 3. `services/ingestion-scraper`
@@ -181,32 +421,6 @@ The `ingestion-scraper` service includes dedicated adapters for major web-novel 
 - **OpenNovel (`opennovel.co`)**: Modern HTML container extraction with ad-slot filtering.
 - **Project Gutenberg (`gutenberg.org`)**: Strips Gutenberg legal license headers and footers for public domain training text.
 
-### Scraping Architecture
-```text
-URL Input ---> Domain Resolver ---> FlareSolverr (if Cloudflare active)
-                     |
-                     v
-             BeautifulSoup HTML Parser
-                     |
-       +-------------+-------------+
-       v                           v
-Title Extractor             Noise Decomposer
-(h1, h2, custom)        (ads, scripts, nav, footers)
-       |                           |
-       +-------------+-------------+
-                     v
-          Paragraph Text Extractor
-                     |
-                     v
-          Watermark & Ad Scrubber
-                     |
-                     v
-       SHA-256 Deduplication Check
-                     |
-                     v
-   Stored to SQLite / Postgres & Datasets
-```
-
 ---
 
 ## Reinforcement Learning and 15-Dimension Trait DNA Engine
@@ -230,12 +444,6 @@ Every writing agent in OmniScribe Studio is governed by a **15-dimension numeric
 14. **`metaphor_frequency`**: Density of symbolic imagery and analogical descriptions.
 15. **`ruthlessness`**: Decisive, proactive protagonist actions vs. merciful hesitation.
 
-### Evolution Mechanisms
-- **Explicit Feedback**: When an author clicks `+1 /rate good` or `-1 /rate bad`, the associated agent's traits shift by calibrated deltas (+0.03 / -0.03).
-- **Implicit Feedback (Edit Distance)**: If an author significantly shortens an agent's output, `verbosity` decreases automatically. If the author inserts archaic vocabulary, `archaism` increments.
-- **Boundary Enforcement**: Every agent has defined `[floor, ceiling]` constraints preventing extreme drift.
-- **Audit Logging**: Every trait evolution is recorded in `data/trait_engine/trait_evolution_log.jsonl` with timestamps and causal reasons.
-
 ---
 
 ## Open Source Models for Novel Writing and Translation
@@ -251,105 +459,22 @@ OmniScribe Studio is built to run entirely on local GPUs via **vLLM**, **Ollama*
 | **Command-R / Command-R+ (35B-104B)** | Extended Context Continuity Auditing and Plot RAG | Q4_K_M GGUF | 128K |
 | **BGE-Large-EN-v1.5 / BGE-M3** | Dense Vector Embeddings for Qdrant Lore Retrieval | FP16, INT8 | 8K |
 
-To use any local model, specify its endpoint in `.env`:
-```env
-LLM_BASE_URL=http://localhost:11434/v1
-LLM_API_KEY=ollama
-DEFAULT_PROSE_MODEL=openai/qwen2.5:14b
-TRANSLATION_MODEL=openai/dao-9b
-UNCENSORED_MODEL=openai/dolphin-mistral-nemo:12b
-```
-
 ---
 
-## User Interfaces: Flutter UI and Angular Desktop UI
+## User Interfaces: Flutter and Angular Desktop UI
 
-OmniScribe Studio provides two frontend implementations:
+OmniScribe Studio provides two client options:
 
-### 1. Angular 19 Desktop Interface (`frontend-angular`)
-- Built with Angular 19 and Tauri for lightweight desktop deployment.
-- Three custom themes: **Light Parchment**, **Dark Obsidian**, and **Neutral Grey Studio**.
-- Split-screen workspace: Left pane for versioned paragraph editing with instant undo; right pane for multi-agent parallel chat.
-- Collapsible bottom drawer for live telemetry and WebSocket progress logs.
-- Zero emojis across all UI components for a distraction-free writing environment.
-
-### 2. Flutter Cross-Platform UI
-- Designed for tablet, mobile, and lightweight desktop environments.
-- Direct WebSocket and REST connection to the `core-gateway` at port 8000.
-- Touch-friendly paragraph cards and quick trait feedback buttons.
-
----
-
-## Prerequisites and uv Environment Setup
-
-### System Requirements
-- **Operating System**: Windows 10/11, Ubuntu 22.04+, or macOS Sonoma+
-- **Python**: Version 3.12 or higher
-- **Package Manager**: [Astral `uv`](https://docs.astral.sh/uv/) (v0.5.0 or newer)
-- **Docker & Docker Compose**: For PostgreSQL, Neo4j, Qdrant, Redis, and FlareSolverr
-- **Node.js**: Version 20+ (for Angular frontend)
-
-### Installation Steps
-
-1. **Install Astral `uv`**:
-   - On Windows (PowerShell):
-     ```powershell
-     powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
-     ```
-   - On Linux / macOS:
-     ```bash
-     curl -LsSf https://astral.sh/uv/install.sh | sh
-     ```
-
-2. **Clone the Repository**:
-   ```bash
-   git clone https://github.com/your-username/omniscribe-studio.git
-   cd omniscribe-studio
-   ```
-
-3. **Install Python 3.12 and Sync the Workspace**:
-   ```bash
-   uv python pin 3.12
-   uv sync
-   ```
-   This command installs all required libraries across all eight microservices within a single coordinated virtual environment (`.venv`).
-
-4. **Verify Installation**:
-   ```bash
-   uv run pytest -k "test_anti_cliche_and_punctuation_scrubber or test_site_specific_extractors"
-   ```
-
----
-
-## Docker Services and Volume Management
-
-OmniScribe Studio includes a production `docker-compose.yml` defining the supporting infrastructure services.
-
-### Start All Services
-```bash
-docker compose up -d
-```
-
-### Services Included
-| Service | Image | Internal Port | Host Port | Purpose |
-|---|---|---|---|---|
-| **postgres** | `postgres:16-alpine` | 5432 | 5432 | Primary relational store for Agent Trait DNA, chapters, and edit history. |
-| **neo4j** | `neo4j:5.24-community` | 7474, 7687 | 7474, 7687 | Graph database for character profiles, sect relationships, and lore trees. |
-| **qdrant** | `qdrant/qdrant:v1.12.0` | 6333, 6334 | 6333, 6334 | Vector database for scene retrieval and semantic memory. |
-| **redis** | `redis:7.4-alpine` | 6379 | 6379 | Pub/sub message bus and live progress telemetry streaming. |
-| **flaresolverr** | `ghcr.io/flaresolverr/flaresolverr:latest` | 8191 | 8191 | Cloudflare bypass proxy for web scraping. |
-
-### Volume Isolation
-All persistent state is stored in the local `./data` directory:
-- `./data/postgres`: PostgreSQL database files.
-- `./data/neo4j`: Graph database nodes, relationships, and logs.
-- `./data/qdrant`: Vector index files.
-- `./data/redis`: Redis append-only files (AOF).
-- `./data/trait_engine`: Local SQLite database (`traits.db`) and evolution logs (`trait_evolution_log.jsonl`).
-- `./data/training_datasets`: Fine-tuning datasets generated by `model-trainer`.
-- `./data/lora_adapters`: Output directory for trained LoRA weights.
-
-All database files and training artifacts inside `./data` are strictly excluded from version control via `.gitignore`.
+1. **Angular 19 Desktop Interface (`frontend-angular`)**:
+   - Built with Angular 19 and Tauri.
+   - Three studio themes: **Light Parchment**, **Dark Obsidian**, and **Neutral Grey Studio**.
+   - Storage switcher and live Docker status modal.
+   - Paragraph-by-paragraph versioned editor with instant undo.
+   - Non-blocking multi-agent chat room with background task counters.
+   - Zero emojis across all interface components for a distraction-free writing experience.
+2. **Flutter Cross-Platform UI**:
+   - Designed for tablet, mobile, and lightweight desktop environments.
+   - Real-time connection to `core-gateway` REST endpoints and `/ws/stream`.
 
 ---
 
@@ -364,7 +489,7 @@ uv run pytest -v
 # Run only scraper and anti-cliche tests
 uv run pytest -k "test_anti_cliche_and_punctuation_scrubber or test_site_specific_extractors"
 
-# Run with verbose output and no warnings suppression
+# Run with verbose output
 uv run pytest -v -W ignore::DeprecationWarning
 ```
 
@@ -372,35 +497,31 @@ uv run pytest -v -W ignore::DeprecationWarning
 
 ## API Reference
 
-### Health and Status
-- `GET /health`
-  Returns the health status of all database engines, message queues, and registered agents.
+### Health and Settings
+- `GET /api/health`
+  Returns health diagnostics for PostgreSQL, Neo4j, Qdrant, Redis, and active storage mode.
+- `POST /api/settings/storage-mode`
+  Dynamically switches storage target between `docker` and `local`.
 
 ### Ingestion and Scraping
-- `POST /api/v1/ingest/file`
-  Upload an `.epub`, `.pdf`, `.docx`, `.md`, or `.txt` file for parsing and deduplicated chapter extraction.
-- `POST /api/v1/ingest/web`
-  Scrape a chapter or full novel from a URL (Twkan, 69shuba, WTR, OpenNovel, Gutenberg).
+- `POST /api/ingest/directory`
+  Ingests local files from a directory, classifies genre, and handles deduplication.
+- `POST /api/ingest/web`
+  Scrapes chapters from URLs (Twkan, 69shuba, WTR, OpenNovel, Gutenberg).
 
-### Translation Pipeline
-- `POST /api/v1/translate/chapter`
-  Translates or polishes a raw chapter using `Dao-9B` with term glossaries and parallel paragraph processing.
+### Manuscript Editor
+- `POST /api/editor/process-chapter`
+  Polishes paragraphs in parallel batches with anti-cliche filtering.
+- `POST /api/editor/undo-paragraph`
+  Restores a specific paragraph to any previous version.
 
 ### Multi-Agent Council
-- `POST /api/v1/agent/chat`
-  Send a message to the agent council or target a specific specialist (`@kael_blades`, `@nyx_unfiltered`).
-- `POST /api/v1/agent/rate`
-  Submit feedback on an agent's response to evolve its 15-dimension Trait DNA vector.
-- `WebSocket /ws/studio`
-  Multiplexed real-time bidirectional agent chat and editing channel.
-- `WebSocket /ws/telemetry`
-  Live telemetry stream reporting progress for scrapers, translators, and training jobs.
-
-### Model Training
-- `POST /api/v1/trainer/export-dataset`
-  Build an instruction fine-tuning dataset from a collection of chapters.
-- `POST /api/v1/trainer/trigger-qlora`
-  Generate and trigger an Unsloth 4-bit QLoRA fine-tuning job for local 7B-15B models.
+- `POST /api/chat/send`
+  Dispatches non-blocking chat messages to specialist agents.
+- `POST /api/rl/implicit-feedback`
+  Submits author edit diffs to recalibrate agent trait DNA vectors.
+- `WebSocket /ws/stream`
+  Bidirectional stream for real-time agent output and progress logs.
 
 ---
 
