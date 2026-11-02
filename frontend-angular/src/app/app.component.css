@@ -61,10 +61,52 @@
 }
 .splash-card {
   text-align: center;
-  padding: 2.5rem;
+  padding: 2.5rem 3.5rem;
   border: 1px solid #38bdf8;
   border-radius: 16px;
-  background: rgba(15, 23, 42, 0.9);
+  background: rgba(15, 23, 42, 0.95);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(56, 189, 248, 0.2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.splash-logo-img {
+  width: 90px;
+  height: 90px;
+  margin-bottom: 1.25rem;
+  animation: pulseLogo 2.5s infinite ease-in-out;
+}
+@keyframes pulseLogo {
+  0%, 100% { transform: scale(1); filter: drop-shadow(0 0 10px rgba(245, 158, 11, 0.4)); }
+  50% { transform: scale(1.05); filter: drop-shadow(0 0 20px rgba(56, 189, 248, 0.7)); }
+}
+.splash-progress-bar {
+  width: 240px;
+  height: 6px;
+  background: #1e293b;
+  border-radius: 3px;
+  overflow: hidden;
+  margin: 1.2rem auto 0.8rem;
+}
+.splash-fill {
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(90deg, #f59e0b, #38bdf8);
+  animation: loadingProgress 1.4s infinite ease-in-out;
+}
+@keyframes loadingProgress {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+.boot-status {
+  font-size: 0.82rem;
+  color: #94a3b8;
+  font-family: monospace;
+}
+.brand-logo-img {
+  width: 28px;
+  height: 28px;
+  vertical-align: middle;
 }
 
 /* Topbar & Workspace */
