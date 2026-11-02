@@ -102,16 +102,23 @@ class CharacterProfileRequest(BaseModel):
 # ---------------------------------------------------------------------------
 # REST Endpoints
 # ---------------------------------------------------------------------------
+class StorageModeRequest(BaseModel):
+    mode: str = "docker"  # "docker" | "local"
+
+
 @app.get("/api/health")
 async def health_check() -> dict[str, Any]:
+    status = await db_service.get_service_status()
     return {
         "status": "online",
         "codename": "DaoForge",
-        "sqlite_fallback_active": db_service.using_sqlite_fallback,
-        "neo4j_connected": db_service.neo4j_driver is not None,
-        "qdrant_connected": db_service.qdrant_client is not None,
-        "redis_connected": db_service.redis_client is not None,
+        **status,
     }
+
+
+@app.post("/api/settings/storage-mode")
+async def set_storage_mode(req: StorageModeRequest) -> dict[str, Any]:
+    return await db_service.set_storage_mode(req.mode)
 
 
 @app.get("/api/agents")
