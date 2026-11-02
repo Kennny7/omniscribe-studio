@@ -277,14 +277,34 @@ uv run --package core-gateway uvicorn core_gateway.main:app --reload --host 0.0.
 - Interactive API Documentation (Swagger UI): `http://localhost:8000/docs`
 - Service Health Diagnostics: `http://localhost:8000/api/health`
 
-### Step 5: Launch Frontend Interface (Angular / Desktop)
-Open a new terminal window, navigate to the frontend directory, install dependencies, and start the development server with live reload:
+### Step 5: Launch Frontend Interface (Browser or Native Desktop)
+Open a new terminal window, navigate to the frontend directory, and choose your preferred execution mode:
+
+#### Option A: Run in Web Browser via Angular Dev Server (No Rust Required)
 ```bash
 cd frontend-angular
 npm install
 npx ng serve --open
 ```
-The studio workspace will open automatically at `http://localhost:4200`.
+The studio workspace will open automatically in your default browser at `http://localhost:4200` with hot module reloading.
+
+#### Option B: Run as a Native Desktop App via Tauri (Requires Rust)
+If you have [Rust and Cargo](https://rustup.rs/) installed, you can run or compile OmniScribe Studio as a lightweight native desktop executable:
+```bash
+cd frontend-angular
+npm install
+
+# Run native desktop app in development mode
+npx tauri dev
+# or with cargo:
+cargo tauri dev
+
+# Compile standalone production desktop installer / binary (.exe, .dmg, .AppImage)
+npx tauri build
+# or with cargo:
+cargo tauri build
+```
+The native binary compiles into `frontend-angular/src-tauri/target/release/` using OS WebView2, creating a compact executable with custom window constraints, zero browser chrome, and minimal memory overhead.
 
 ---
 
@@ -465,13 +485,14 @@ OmniScribe Studio is built to run entirely on local GPUs via **vLLM**, **Ollama*
 
 OmniScribe Studio provides two client options:
 
-1. **Angular 19 Desktop Interface (`frontend-angular`)**:
-   - Built with Angular 19 and Tauri.
-   - Three studio themes: **Light Parchment**, **Dark Obsidian**, and **Neutral Grey Studio**.
-   - Storage switcher and live Docker status modal.
-   - Paragraph-by-paragraph versioned editor with instant undo.
-   - Non-blocking multi-agent chat room with background task counters.
-   - Zero emojis across all interface components for a distraction-free writing experience.
+1. **Angular 19 & Tauri Desktop Interface (`frontend-angular`)**:
+   - **Browser Mode**: `npx ng serve --open` for zero-install development in any modern browser.
+   - **Native Desktop Mode**: `cargo tauri dev` or `npx tauri build` for standalone desktop execution via Tauri v2 with native window decorations, dark background, and preconfigured CSP.
+   - **Three Studio Themes**: **Light Parchment**, **Dark Obsidian**, and **Neutral Grey Studio**.
+   - **Live Storage Switcher**: Interactive header status pill and configuration modal showing Docker container health vs. local SQLite lite mode.
+   - **Versioned Manuscript Editor**: Paragraph-by-paragraph version history with instant rollback to prevent deadlock.
+   - **Non-Blocking Multi-Agent Council**: Asynchronous chat input that remains active while specialist agents generate prose.
+   - **Distraction-Free**: Zero emojis across all UI elements and documentation.
 2. **Flutter Cross-Platform UI**:
    - Designed for tablet, mobile, and lightweight desktop environments.
    - Real-time connection to `core-gateway` REST endpoints and `/ws/stream`.
