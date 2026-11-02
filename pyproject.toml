@@ -1,0 +1,76 @@
+# omniscribe-studio/pyproject.toml
+[project]
+name = "omniscribe-studio"
+version = "1.0.0"
+description = "Autonomous Multi-Agent Literary Engine & World-Building Ecosystem (Codename: DaoForge)"
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "Apache-2.0" }
+authors = [
+    { name = "OmniScribe Architecture Team", email = "arch@omniscribe.ai" }
+]
+dependencies = [
+    "pydantic>=2.9.0",
+    "pydantic-settings>=2.5.2",
+    "structlog>=24.4.0",
+    "tenacity>=9.0.0",
+    "httpx>=0.27.2",
+    "redis>=5.1.1",
+    "sqlalchemy[asyncio]>=2.0.35",
+    "asyncpg>=0.29.0",
+    "aiosqlite>=0.20.0",
+    "neo4j>=5.25.0",
+    "qdrant-client>=1.12.0",
+    "litellm>=1.50.0",
+    "fastapi>=0.115.0",
+    "uvicorn>=0.31.0",
+    "beautifulsoup4>=4.12.3",
+    "ebooklib>=0.18",
+    "pypdf>=5.0.0",
+    "python-docx>=1.1.2",
+    "shared-core",
+    "agent-swarm",
+    "core-gateway",
+    "ingestion-scraper",
+    "manuscript-editor",
+    "model-trainer",
+    "rag-lore-engine",
+    "translation-pipeline",
+]
+
+[tool.uv.workspace]
+members = [
+    "services/shared-core",
+    "services/core-gateway",
+    "services/ingestion-scraper",
+    "services/translation-pipeline",
+    "services/rag-lore-engine",
+    "services/agent-swarm",
+    "services/manuscript-editor",
+    "services/model-trainer",
+]
+
+[tool.uv.sources]
+shared-core = { workspace = true }
+agent-swarm = { workspace = true }
+core-gateway = { workspace = true }
+ingestion-scraper = { workspace = true }
+manuscript-editor = { workspace = true }
+model-trainer = { workspace = true }
+rag-lore-engine = { workspace = true }
+translation-pipeline = { workspace = true }
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3.3",
+    "pytest-asyncio>=0.24.0",
+    "ruff>=0.6.9",
+    "mypy>=1.11.2",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
