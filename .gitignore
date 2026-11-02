@@ -1,0 +1,45 @@
+# Python and Environment
+.venv/
+venv/
+ENV/
+env/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# OmniScribe Persistent State & Mounts
+# Mounted docker volumes and generated trait/model datasets
+data/postgres/
+data/neo4j/
+data/qdrant/
+data/redis/
+data/training_datasets/
+data/lora_adapters/
+data/trait_engine/traits.db
+data/trait_engine/traits.db-shm
+data/trait_engine/traits.db-wal
+data/trait_engine/trait_evolution_log.jsonl
+
+# Node & Frontend (Angular / Tauri)
+frontend-angular/node_modules/
+frontend-angular/dist/
+frontend-angular/.angular/
+frontend-angular/src-tauri/target/
+
+# Flutter UI (if present / builds)
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+build/
+*.iml
+.idea/
+
+# Environment Variables & Secrets
+.env
+.env.local
+.env.*.local
+*.log
